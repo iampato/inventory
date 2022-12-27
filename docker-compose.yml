@@ -1,0 +1,32 @@
+version: "2"
+services:
+  products:
+    build:
+      context: .
+      dockerfile: products/Dockerfile
+    restart: always
+    volumes:
+    - .:/go/src/inventory
+    container_name: products
+    ports:
+    - 8801:8081
+  sale:
+    build:
+      context: .
+      dockerfile: sale/Dockerfile
+    restart: always
+    volumes:
+    - .:/go/src/inventory
+    container_name: sale
+    ports:
+    - 8800:8081
+  user:
+    build:
+      context: .
+      dockerfile: user/Dockerfile
+    restart: always
+    volumes:
+    - .:/go/src/inventory
+    container_name: user
+    ports:
+    - 8802:8081
