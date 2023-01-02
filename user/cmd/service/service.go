@@ -4,9 +4,16 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"net"
+	http2 "net/http"
+	"os"
+	"os/signal"
+	"syscall"
+
 	endpoint1 "github.com/go-kit/kit/endpoint"
-	log "github.com/go-kit/kit/log"
 	prometheus "github.com/go-kit/kit/metrics/prometheus"
+	log "github.com/go-kit/log"
+	"github.com/iampato/inventory/user/config"
 	endpoint "github.com/iampato/inventory/user/pkg/endpoint"
 	http1 "github.com/iampato/inventory/user/pkg/http"
 	service "github.com/iampato/inventory/user/pkg/service"
@@ -18,13 +25,8 @@ import (
 	http "github.com/openzipkin/zipkin-go/reporter/http"
 	prometheus1 "github.com/prometheus/client_golang/prometheus"
 	promhttp "github.com/prometheus/client_golang/prometheus/promhttp"
-	"net"
-	http2 "net/http"
-	"os"
-	"os/signal"
 	appdash "sourcegraph.com/sourcegraph/appdash"
 	opentracing "sourcegraph.com/sourcegraph/appdash/opentracing"
-	"syscall"
 )
 
 var tracer opentracinggo.Tracer
@@ -84,7 +86,16 @@ func Run() {
 		tracer = opentracinggo.GlobalTracer()
 	}
 
-	svc := service.New(getServiceMiddleware(logger))
+	//
+	db := config.ConnectToDb()
+	// close the db connection on exit
+	defer func() {
+		fmt.Println("############## DB is closing ###############")
+		sqlDB, _ := db.DB()
+		sqlDB.Close()
+	}()
+
+	svc := service.New(getServiceMiddleware(logger), db)
 	eps := endpoint.New(svc, getEndpointMiddleware(logger))
 	g := createService(eps)
 	initMetricsEndpoint(g)
