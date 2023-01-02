@@ -3,7 +3,7 @@ package service
 import (
 	"context"
 
-	log "github.com/go-kit/log"
+	log "github.com/go-kit/kit/log"
 	entities "github.com/iampato/inventory/user/pkg/entities"
 )
 
@@ -30,11 +30,11 @@ func (l loggingMiddleware) CreateRole(ctx context.Context, roleName string) (err
 	}()
 	return l.next.CreateRole(ctx, roleName)
 }
-func (l loggingMiddleware) FetchAllRoles(ctx context.Context) (roles []entities.UserRole) {
+func (l loggingMiddleware) GetAllRoles(ctx context.Context) (roles []entities.UserRole) {
 	defer func() {
-		l.logger.Log("method", "FetchAllRoles", "roles", roles)
+		l.logger.Log("method", "GetAllRoles", "roles", roles)
 	}()
-	return l.next.FetchAllRoles(ctx)
+	return l.next.GetAllRoles(ctx)
 }
 func (l loggingMiddleware) Create(ctx context.Context, firstName string, lastName string, emailAddress string, phone string, password string, roleId int, dob string) (user entities.UserModel, err error) {
 	defer func() {
@@ -42,9 +42,9 @@ func (l loggingMiddleware) Create(ctx context.Context, firstName string, lastNam
 	}()
 	return l.next.Create(ctx, firstName, lastName, emailAddress, phone, password, roleId, dob)
 }
-func (l loggingMiddleware) FetchAllUsers(ctx context.Context, limit int, offset int) (users []entities.UserModel, total int64, page int64, lastPage int64) {
+func (l loggingMiddleware) GetAllUsers(ctx context.Context, limit int, offset int) (users []entities.UserModel, total int64, page int64, lastPage int64) {
 	defer func() {
-		l.logger.Log("method", "FetchAllUsers", "limit", limit, "offset", offset, "users", users, "total", total, "page", page, "lastPage", lastPage)
+		l.logger.Log("method", "GetAllUsers", "limit", limit, "offset", offset, "users", users, "total", total, "page", page, "lastPage", lastPage)
 	}()
-	return l.next.FetchAllUsers(ctx, limit, offset)
+	return l.next.GetAllUsers(ctx, limit, offset)
 }

@@ -2,6 +2,7 @@ package endpoint
 
 import (
 	"context"
+
 	endpoint "github.com/go-kit/kit/endpoint"
 	entities "github.com/iampato/inventory/user/pkg/entities"
 	service "github.com/iampato/inventory/user/pkg/service"
@@ -31,19 +32,19 @@ func (r CreateRoleResponse) Failed() error {
 	return r.Err
 }
 
-// FetchAllRolesRequest collects the request parameters for the FetchAllRoles method.
-type FetchAllRolesRequest struct{}
+// GetAllRolesRequest collects the request parameters for the GetAllRoles method.
+type GetAllRolesRequest struct{}
 
-// FetchAllRolesResponse collects the response parameters for the FetchAllRoles method.
-type FetchAllRolesResponse struct {
+// GetAllRolesResponse collects the response parameters for the GetAllRoles method.
+type GetAllRolesResponse struct {
 	Roles []entities.UserRole `json:"roles"`
 }
 
-// MakeFetchAllRolesEndpoint returns an endpoint that invokes FetchAllRoles on the service.
-func MakeFetchAllRolesEndpoint(s service.UserService) endpoint.Endpoint {
+// MakeGetAllRolesEndpoint returns an endpoint that invokes GetAllRoles on the service.
+func MakeGetAllRolesEndpoint(s service.UserService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		roles := s.FetchAllRoles(ctx)
-		return FetchAllRolesResponse{Roles: roles}, nil
+		roles := s.GetAllRoles(ctx)
+		return GetAllRolesResponse{Roles: roles}, nil
 	}
 }
 
@@ -81,26 +82,26 @@ func (r CreateResponse) Failed() error {
 	return r.Err
 }
 
-// FetchAllUsersRequest collects the request parameters for the FetchAllUsers method.
-type FetchAllUsersRequest struct {
+// GetAllUsersRequest collects the request parameters for the GetAllUsers method.
+type GetAllUsersRequest struct {
 	Limit  int `json:"limit"`
 	Offset int `json:"offset"`
 }
 
-// FetchAllUsersResponse collects the response parameters for the FetchAllUsers method.
-type FetchAllUsersResponse struct {
+// GetAllUsersResponse collects the response parameters for the GetAllUsers method.
+type GetAllUsersResponse struct {
 	Users    []entities.UserModel `json:"users"`
 	Total    int64                `json:"total"`
 	Page     int64                `json:"page"`
 	LastPage int64                `json:"last_page"`
 }
 
-// MakeFetchAllUsersEndpoint returns an endpoint that invokes FetchAllUsers on the service.
-func MakeFetchAllUsersEndpoint(s service.UserService) endpoint.Endpoint {
+// MakeGetAllUsersEndpoint returns an endpoint that invokes GetAllUsers on the service.
+func MakeGetAllUsersEndpoint(s service.UserService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		req := request.(FetchAllUsersRequest)
-		users, total, page, lastPage := s.FetchAllUsers(ctx, req.Limit, req.Offset)
-		return FetchAllUsersResponse{
+		req := request.(GetAllUsersRequest)
+		users, total, page, lastPage := s.GetAllUsers(ctx, req.Limit, req.Offset)
+		return GetAllUsersResponse{
 			LastPage: lastPage,
 			Page:     page,
 			Total:    total,
@@ -126,14 +127,14 @@ func (e Endpoints) CreateRole(ctx context.Context, roleName string) (err error) 
 	return response.(CreateRoleResponse).Err
 }
 
-// FetchAllRoles implements Service. Primarily useful in a client.
-func (e Endpoints) FetchAllRoles(ctx context.Context) (roles []entities.UserRole) {
-	request := FetchAllRolesRequest{}
-	response, err := e.FetchAllRolesEndpoint(ctx, request)
+// GetAllRoles implements Service. Primarily useful in a client.
+func (e Endpoints) GetAllRoles(ctx context.Context) (roles []entities.UserRole) {
+	request := GetAllRolesRequest{}
+	response, err := e.GetAllRolesEndpoint(ctx, request)
 	if err != nil {
 		return
 	}
-	return response.(FetchAllRolesResponse).Roles
+	return response.(GetAllRolesResponse).Roles
 }
 
 // Create implements Service. Primarily useful in a client.
@@ -154,15 +155,15 @@ func (e Endpoints) Create(ctx context.Context, firstName string, lastName string
 	return response.(CreateResponse).User, response.(CreateResponse).Err
 }
 
-// FetchAllUsers implements Service. Primarily useful in a client.
-func (e Endpoints) FetchAllUsers(ctx context.Context, limit int, offset int) (users []entities.UserModel, total int64, page int64, lastPage int64) {
-	request := FetchAllUsersRequest{
+// GetAllUsers implements Service. Primarily useful in a client.
+func (e Endpoints) GetAllUsers(ctx context.Context, limit int, offset int) (users []entities.UserModel, total int64, page int64, lastPage int64) {
+	request := GetAllUsersRequest{
 		Limit:  limit,
 		Offset: offset,
 	}
-	response, err := e.FetchAllUsersEndpoint(ctx, request)
+	response, err := e.GetAllUsersEndpoint(ctx, request)
 	if err != nil {
 		return
 	}
-	return response.(FetchAllUsersResponse).Users, response.(FetchAllUsersResponse).Total, response.(FetchAllUsersResponse).Page, response.(FetchAllUsersResponse).LastPage
+	return response.(GetAllUsersResponse).Users, response.(GetAllUsersResponse).Total, response.(GetAllUsersResponse).Page, response.(GetAllUsersResponse).LastPage
 }

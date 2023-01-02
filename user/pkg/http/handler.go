@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"errors"
 	http1 "net/http"
-	"strconv"
 
 	http "github.com/go-kit/kit/transport/http"
 	handlers "github.com/gorilla/handlers"
@@ -38,22 +37,22 @@ func encodeCreateRoleResponse(ctx context.Context, w http1.ResponseWriter, respo
 	return
 }
 
-// makeFetchAllRolesHandler creates the handler logic
-func makeFetchAllRolesHandler(m *mux.Router, endpoints endpoint.Endpoints, options []http.ServerOption) {
-	m.Methods("GET").Path("/fetch-all-roles").Handler(handlers.CORS(handlers.AllowedMethods([]string{"GET"}), handlers.AllowedOrigins([]string{"*"}))(http.NewServer(endpoints.FetchAllRolesEndpoint, decodeFetchAllRolesRequest, encodeFetchAllRolesResponse, options...)))
+// makeGetAllRolesHandler creates the handler logic
+func makeGetAllRolesHandler(m *mux.Router, endpoints endpoint.Endpoints, options []http.ServerOption) {
+	m.Methods("POST").Path("/get-all-roles").Handler(handlers.CORS(handlers.AllowedMethods([]string{"POST"}), handlers.AllowedOrigins([]string{"*"}))(http.NewServer(endpoints.GetAllRolesEndpoint, decodeGetAllRolesRequest, encodeGetAllRolesResponse, options...)))
 }
 
-// decodeFetchAllRolesRequest is a transport/http.DecodeRequestFunc that decodes a
+// decodeGetAllRolesRequest is a transport/http.DecodeRequestFunc that decodes a
 // JSON-encoded request from the HTTP request body.
-func decodeFetchAllRolesRequest(_ context.Context, r *http1.Request) (interface{}, error) {
-	req := endpoint.FetchAllRolesRequest{}
-	// err := json.NewDecoder(r.Body).Decode(&req)
-	return req, nil
+func decodeGetAllRolesRequest(_ context.Context, r *http1.Request) (interface{}, error) {
+	req := endpoint.GetAllRolesRequest{}
+	err := json.NewDecoder(r.Body).Decode(&req)
+	return req, err
 }
 
-// encodeFetchAllRolesResponse is a transport/http.EncodeResponseFunc that encodes
+// encodeGetAllRolesResponse is a transport/http.EncodeResponseFunc that encodes
 // the response as JSON to the response writer
-func encodeFetchAllRolesResponse(ctx context.Context, w http1.ResponseWriter, response interface{}) (err error) {
+func encodeGetAllRolesResponse(ctx context.Context, w http1.ResponseWriter, response interface{}) (err error) {
 	if f, ok := response.(endpoint.Failure); ok && f.Failed() != nil {
 		ErrorEncoder(ctx, f.Failed(), w)
 		return nil
@@ -88,54 +87,22 @@ func encodeCreateResponse(ctx context.Context, w http1.ResponseWriter, response 
 	return
 }
 
-// makeFetchAllUsersHandler creates the handler logic
-func makeFetchAllUsersHandler(m *mux.Router, endpoints endpoint.Endpoints, options []http.ServerOption) {
-	m.Methods("GET").Path("/fetch-all-users").Handler(
-		handlers.CORS(handlers.AllowedMethods([]string{"GET"}),
-			handlers.AllowedOrigins([]string{"*"}))(http.NewServer(endpoints.FetchAllUsersEndpoint, decodeFetchAllUsersRequest, encodeFetchAllUsersResponse, options...)))
+// makeGetAllUsersHandler creates the handler logic
+func makeGetAllUsersHandler(m *mux.Router, endpoints endpoint.Endpoints, options []http.ServerOption) {
+	m.Methods("POST").Path("/get-all-users").Handler(handlers.CORS(handlers.AllowedMethods([]string{"POST"}), handlers.AllowedOrigins([]string{"*"}))(http.NewServer(endpoints.GetAllUsersEndpoint, decodeGetAllUsersRequest, encodeGetAllUsersResponse, options...)))
 }
 
-// decodeFetchAllUsersRequest is a transport/http.DecodeRequestFunc that decodes a
+// decodeGetAllUsersRequest is a transport/http.DecodeRequestFunc that decodes a
 // JSON-encoded request from the HTTP request body.
-func decodeFetchAllUsersRequest(_ context.Context, r *http1.Request) (interface{}, error) {
-
-	// get query params from r
-	params := r.URL.Query()
-	// params := mux.Vars(r) // how to get params from a UR
-	var limitInt, pageInt int
-	var err error
-	limitStr := params.Get("limit")
-	pageStr := params.Get("page")
-
-	if len(limitStr) == 0 {
-		limitInt = 15
-	} else {
-		limitInt, err = strconv.Atoi(limitStr)
-		if err != nil {
-			limitInt = 15
-		}
-	}
-
-	if len(pageStr) == 0 {
-		pageInt = 1
-	} else {
-		pageInt, err = strconv.Atoi(pageStr)
-		if err != nil {
-			pageInt = 1
-		}
-	}
-
-	req := endpoint.FetchAllUsersRequest{
-		Limit:  limitInt,
-		Offset: pageInt,
-	}
-	// err := json.NewDecoder(r.Body).Decode(&req)
+func decodeGetAllUsersRequest(_ context.Context, r *http1.Request) (interface{}, error) {
+	req := endpoint.GetAllUsersRequest{}
+	err := json.NewDecoder(r.Body).Decode(&req)
 	return req, err
 }
 
-// encodeFetchAllUsersResponse is a transport/http.EncodeResponseFunc that encodes
+// encodeGetAllUsersResponse is a transport/http.EncodeResponseFunc that encodes
 // the response as JSON to the response writer
-func encodeFetchAllUsersResponse(ctx context.Context, w http1.ResponseWriter, response interface{}) (err error) {
+func encodeGetAllUsersResponse(ctx context.Context, w http1.ResponseWriter, response interface{}) (err error) {
 	if f, ok := response.(endpoint.Failure); ok && f.Failed() != nil {
 		ErrorEncoder(ctx, f.Failed(), w)
 		return nil

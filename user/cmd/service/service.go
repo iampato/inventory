@@ -11,8 +11,8 @@ import (
 	"syscall"
 
 	endpoint1 "github.com/go-kit/kit/endpoint"
+	log "github.com/go-kit/kit/log"
 	prometheus "github.com/go-kit/kit/metrics/prometheus"
-	log "github.com/go-kit/log"
 	"github.com/iampato/inventory/user/config"
 	endpoint "github.com/iampato/inventory/user/pkg/endpoint"
 	http1 "github.com/iampato/inventory/user/pkg/http"
@@ -85,8 +85,6 @@ func Run() {
 		logger.Log("tracer", "none")
 		tracer = opentracinggo.GlobalTracer()
 	}
-
-	//
 	db := config.ConnectToDb()
 	// close the db connection on exit
 	defer func() {

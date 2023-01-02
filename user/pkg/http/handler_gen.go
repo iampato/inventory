@@ -13,8 +13,8 @@ import (
 func NewHTTPHandler(endpoints endpoint.Endpoints, options map[string][]http.ServerOption) http1.Handler {
 	m := mux.NewRouter()
 	makeCreateRoleHandler(m, endpoints, options["CreateRole"])
-	makeFetchAllRolesHandler(m, endpoints, options["FetchAllRoles"])
+	makeGetAllRolesHandler(m, endpoints, options["GetAllRoles"])
 	makeCreateHandler(m, endpoints, options["Create"])
-	makeFetchAllUsersHandler(m, endpoints, options["FetchAllUsers"])
+	makeGetAllUsersHandler(m, endpoints, options["GetAllUsers"])
 	return m
 }

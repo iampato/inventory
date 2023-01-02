@@ -15,9 +15,13 @@ import (
 type UserService interface {
 	// Add your methods here
 	CreateRole(ctx context.Context, roleName string) (err error)
-	FetchAllRoles(ctx context.Context) (roles []entities.UserRole)
+	GetAllRoles(ctx context.Context) (roles []entities.UserRole)
 	Create(ctx context.Context, firstName string, lastName string, emailAddress string, phone string, password string, roleId int, dob string) (user entities.UserModel, err error)
-	FetchAllUsers(ctx context.Context, limit int, offset int) (users []entities.UserModel, total int64, page int64, lastPage int64)
+	GetAllUsers(ctx context.Context, limit int, offset int) (users []entities.UserModel, total int64, page int64, lastPage int64)
+	// updateUser
+	// deleteUser
+	// login user
+
 }
 
 type basicUserService struct {
@@ -91,13 +95,13 @@ func (b *basicUserService) Create(ctx context.Context, firstName string, lastNam
 }
 
 // FetchAllRoles implements UserService
-func (b *basicUserService) FetchAllRoles(ctx context.Context) []entities.UserRole {
+func (b *basicUserService) GetAllRoles(ctx context.Context) []entities.UserRole {
 	roles := entities.FetchAllRoles(b.db)
 	return roles
 }
 
 // FetchAllUsers implements UserService
-func (b *basicUserService) FetchAllUsers(ctx context.Context, limit int, offset int) ([]entities.UserModel, int64, int64, int64) {
+func (b *basicUserService) GetAllUsers(ctx context.Context, limit int, offset int) ([]entities.UserModel, int64, int64, int64) {
 	users := entities.FetchAllUsers(b.db, limit, offset)
 	count := entities.CountUsers(b.db)
 

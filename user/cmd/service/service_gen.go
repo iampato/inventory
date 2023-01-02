@@ -21,24 +21,24 @@ func createService(endpoints endpoint.Endpoints) (g *group.Group) {
 }
 func defaultHttpOptions(logger log.Logger, tracer opentracinggo.Tracer) map[string][]http.ServerOption {
 	options := map[string][]http.ServerOption{
-		"Create":        {http.ServerErrorEncoder(http1.ErrorEncoder), http.ServerErrorLogger(logger), http.ServerBefore(opentracing.HTTPToContext(tracer, "Create", logger))},
-		"CreateRole":    {http.ServerErrorEncoder(http1.ErrorEncoder), http.ServerErrorLogger(logger), http.ServerBefore(opentracing.HTTPToContext(tracer, "CreateRole", logger))},
-		"FetchAllRoles": {http.ServerErrorLogger(logger), http.ServerBefore(opentracing.HTTPToContext(tracer, "FetchAllRoles", logger))},
-		"FetchAllUsers": {http.ServerErrorLogger(logger), http.ServerBefore(opentracing.HTTPToContext(tracer, "FetchAllUsers", logger))},
+		"Create":      {http.ServerErrorEncoder(http1.ErrorEncoder), http.ServerErrorLogger(logger), http.ServerBefore(opentracing.HTTPToContext(tracer, "Create", logger))},
+		"CreateRole":  {http.ServerErrorEncoder(http1.ErrorEncoder), http.ServerErrorLogger(logger), http.ServerBefore(opentracing.HTTPToContext(tracer, "CreateRole", logger))},
+		"GetAllRoles": {http.ServerErrorLogger(logger), http.ServerBefore(opentracing.HTTPToContext(tracer, "GetAllRoles", logger))},
+		"GetAllUsers": {http.ServerErrorLogger(logger), http.ServerBefore(opentracing.HTTPToContext(tracer, "GetAllUsers", logger))},
 	}
 	return options
 }
 func addDefaultEndpointMiddleware(logger log.Logger, duration *prometheus.Summary, mw map[string][]endpoint1.Middleware) {
 	mw["CreateRole"] = []endpoint1.Middleware{endpoint.LoggingMiddleware(log.With(logger, "method", "CreateRole")), endpoint.InstrumentingMiddleware(duration.With("method", "CreateRole"))}
-	mw["FetchAllRoles"] = []endpoint1.Middleware{endpoint.LoggingMiddleware(log.With(logger, "method", "FetchAllRoles")), endpoint.InstrumentingMiddleware(duration.With("method", "FetchAllRoles"))}
+	mw["GetAllRoles"] = []endpoint1.Middleware{endpoint.LoggingMiddleware(log.With(logger, "method", "GetAllRoles")), endpoint.InstrumentingMiddleware(duration.With("method", "GetAllRoles"))}
 	mw["Create"] = []endpoint1.Middleware{endpoint.LoggingMiddleware(log.With(logger, "method", "Create")), endpoint.InstrumentingMiddleware(duration.With("method", "Create"))}
-	mw["FetchAllUsers"] = []endpoint1.Middleware{endpoint.LoggingMiddleware(log.With(logger, "method", "FetchAllUsers")), endpoint.InstrumentingMiddleware(duration.With("method", "FetchAllUsers"))}
+	mw["GetAllUsers"] = []endpoint1.Middleware{endpoint.LoggingMiddleware(log.With(logger, "method", "GetAllUsers")), endpoint.InstrumentingMiddleware(duration.With("method", "GetAllUsers"))}
 }
 func addDefaultServiceMiddleware(logger log.Logger, mw []service.Middleware) []service.Middleware {
 	return append(mw, service.LoggingMiddleware(logger))
 }
 func addEndpointMiddlewareToAllMethods(mw map[string][]endpoint1.Middleware, m endpoint1.Middleware) {
-	methods := []string{"CreateRole", "FetchAllRoles", "Create", "FetchAllUsers"}
+	methods := []string{"CreateRole", "GetAllRoles", "Create", "GetAllUsers"}
 	for _, v := range methods {
 		mw[v] = append(mw[v], m)
 	}
